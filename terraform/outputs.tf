@@ -1,0 +1,1 @@
+# exposes new VM IPs for ansible to consume
