@@ -22,6 +22,12 @@ variable "proxmox_api_token" {
     sensitive = true
 }
 
+variable "proxmox_ssh_password" {
+  description = "Root password for SSH access to the Proxmox node (used for disk import operations)"
+  type        = string
+  sensitive   = true
+}
+
 variable "proxmox_endpoint" {
     description = "Node3 url"
     type = string

@@ -17,4 +17,10 @@ provider "proxmox" {
   # Proxmox's default cert is self-signed in a homelab - set true to skip verification.
   # Revisit this later if you set up a real cert; leaving it insecure is a known tradeoff for now.
   insecure = true
+
+    ssh {
+    agent    = false
+    username = "root"
+    password = var.proxmox_ssh_password
+  }
 }
