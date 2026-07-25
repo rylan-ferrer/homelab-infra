@@ -4,7 +4,13 @@ variable "proxmox_node_name" {
   default     = "Node3"
 }
 
-variable "datastore_id" {
+variable "image_datastore_id" {
+  description = "Where cloud images get stored - check Datacenter > Storage in the web UI"
+  type        = string
+  default     = "local"
+}
+
+variable "vm_datastore_id" {
   description = "Where VM disks get stored - check Datacenter > Storage in the web UI"
   type        = string
   default     = "local-lvm"
