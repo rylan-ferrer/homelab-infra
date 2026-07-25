@@ -19,5 +19,5 @@ variable "vm_datastore_id" {
 variable "proxmox_api_token" {
     description = "Proxmox API Token"
     type = string
-    sensetive = true
+    sensitive = true
 }
