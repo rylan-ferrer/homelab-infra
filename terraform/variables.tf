@@ -1,7 +1,7 @@
 variable "proxmox_node_name" {
   description = "The name of your Proxmox node, as shown in the Proxmox web UI sidebar"
   type        = string
-  default     = "Node3"
+  default     = "Node"
 }
 
 variable "image_datastore_id" {
