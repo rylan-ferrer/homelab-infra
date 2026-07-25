@@ -21,3 +21,8 @@ variable "proxmox_api_token" {
     type = string
     sensitive = true
 }
+
+variable "proxmox_endpoint" {
+    description = "Node3 url"
+    type = string
+}

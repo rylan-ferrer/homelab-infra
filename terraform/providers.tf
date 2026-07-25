@@ -10,7 +10,7 @@ terraform {
 provider "proxmox" {
   # Your Proxmox host's web UI address, without the :8006 port suffix issue -
   # bpg's provider wants the full URL including port and /api2/json is NOT needed here.
-  endpoint = "https://<HOST_A_IP>:8006"
+  endpoint = "var.proxmox_endpoint"
 
   api_token = var.proxmox_api_token
 
