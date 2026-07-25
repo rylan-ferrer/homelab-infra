@@ -12,7 +12,7 @@ provider "proxmox" {
   # bpg's provider wants the full URL including port and /api2/json is NOT needed here.
   endpoint = "https://<HOST_A_IP>:8006"
 
-  api_token = "<TOKEN_ID>=<SECRET>" # e.g. "root@pam!terraform=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  api_token = var.proxmox_api_token
 
   # Proxmox's default cert is self-signed in a homelab - set true to skip verification.
   # Revisit this later if you set up a real cert; leaving it insecure is a known tradeoff for now.

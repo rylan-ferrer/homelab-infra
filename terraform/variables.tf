@@ -15,3 +15,9 @@ variable "vm_datastore_id" {
   type        = string
   default     = "local-lvm"
 }
+
+variable "proxmox_api_token" {
+    description = "Proxmox API Token"
+    type = string
+    sensetive = true
+}
