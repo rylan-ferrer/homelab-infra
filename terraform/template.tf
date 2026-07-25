@@ -4,5 +4,5 @@ resource "proxmox_download_file" "ubuntu_cloud_image" {
   node_name    = var.proxmox_node_name
 
   url       = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
-  file_name = "noble-server-cloudimg-amd64.qcow2" # renaming with .qcow2 tells Proxmox the image format
+  file_name = "noble-server-cloudimg-amd64.img" # renaming with .qcow2 tells Proxmox the image format
 }
