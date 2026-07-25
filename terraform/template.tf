@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
+resource "proxmox_download_file" "ubuntu_cloud_image" {
   content_type = "iso"
   datastore_id = var.image_datastore_id # cloud images get stored here, separate from your VM disk storage
   node_name    = var.proxmox_node_name
