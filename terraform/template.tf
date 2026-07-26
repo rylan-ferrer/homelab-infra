@@ -1,9 +1,10 @@
 resource "proxmox_download_file" "ubuntu_cloud_image" {
+  for_each = toset(concat(local.control_plane_nodes, local.worker_nodes))
+
   content_type = "iso"
-  datastore_id = var.image_datastore_id # cloud images get stored here, separate from your VM disk storage
-  node_name    = var.proxmox_node_name
+  datastore_id = var.image_datastore_id
+  node_name    = each.value
 
   url       = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
-  file_name = "noble-server-cloudimg-amd64.img" # renaming with .qcow2 tells Proxmox the image format
-  overwrite = false
+  file_name = "noble-server-cloudimg-amd64.img"
 }

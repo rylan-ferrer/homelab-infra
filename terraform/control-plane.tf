@@ -3,10 +3,9 @@ resource "proxmox_virtual_environment_vm" "control_plane" {
   name      = "k3s-cp-${count.index + 1}"
   node_name = local.control_plane_nodes[count.index]
 
-  clone {
-    vm_id        = 100
-    node_name    = "node3"
-    datastore_id = var.vm_datastore_id
+clone {
+    vm_id     = proxmox_virtual_environment_vm.ubuntu_template[local.control_plane_nodes[count.index]].vm_id
+    node_name = local.control_plane_nodes[count.index]
   }
 
   lifecycle {

@@ -1,8 +1,8 @@
-# Will use this for VM resource definitions
-
 resource "proxmox_virtual_environment_vm" "ubuntu_template" {
-  name      = "ubuntu-2404-template"
-  node_name = var.proxmox_node_name
+  for_each = toset(concat(local.control_plane_nodes, local.worker_nodes))
+
+  name      = "ubuntu-2404-template-${each.value}"
+  node_name = each.value
   template  = true
   started   = false
 
@@ -20,7 +20,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
 
   disk {
     datastore_id = var.vm_datastore_id
-    file_id      = proxmox_download_file.ubuntu_cloud_image.id
+    file_id      = proxmox_download_file.ubuntu_cloud_image[each.value].id
     interface    = "scsi0"
     size         = 20
   }
@@ -35,11 +35,11 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
         address = "dhcp"
       }
     }
-    vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config["node3"].id
+    vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[each.value].id
 
     user_account {
       username = "ubuntu"
-    keys = [trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))]
+      keys     = [trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))]
     }
   }
 }
