@@ -1,1 +1,24 @@
-#will be used as a cloud init template 
+- name: Initialize first control-plane node
+  hosts: k3s-cp-1
+  become: true
+  tasks:
+    - name: Install k3s as cluster-init server
+      shell: |
+        curl -sfL https://get.k3s.io | sh -s - server --cluster-init
+      args:
+        creates: /etc/rancher/k3s/k3s.yaml
+
+
+- name: Install and connect Tailscale on all nodes
+  hosts: all
+  become: true
+  tasks:
+    - name: Add Tailscale's official install script
+      shell: curl -fsSL https://tailscale.com/install.sh | sh
+      args:
+        creates: /usr/bin/tailscale
+
+    - name: Bring up Tailscale
+      shell: "tailscale up --authkey={{ vault_tailscale_authkey }} --ssh"
+      args:
+        creates: /var/lib/tailscale/tailscaled.state
