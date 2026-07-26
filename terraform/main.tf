@@ -3,8 +3,12 @@
 resource "proxmox_virtual_environment_vm" "ubuntu_template" {
   name      = "ubuntu-2404-template"
   node_name = var.proxmox_node_name
-  template  = true  # marks this as a template - never boots directly, only gets cloned
-  started   = false # templates shouldn't be running
+  template  = true
+  started   = false
+
+  agent {
+    enabled = false
+  }
 
   cpu {
     cores = 2
