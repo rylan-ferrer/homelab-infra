@@ -7,7 +7,24 @@
         curl -sfL https://get.k3s.io | sh -s - server --cluster-init
       args:
         creates: /etc/rancher/k3s/k3s.yaml
+    
+    - name: Read the cluster join token
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token_raw
 
+- name: Join remaining control-plane nodes
+  hosts: k3s-cp-2:k3s-cp-3
+  become: true
+  vars:
+    k3s_url: "https://{{ hostvars['k3s-cp-1']['ansible_host'] }}:6443"
+    k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
+  tasks:
+    - name: Join as additional control-plane node
+      shell: |
+        curl -sfL https://get.k3s.io | sh -s - server --server {{ k3s_url }} --token {{ k3s_token }}
+      args:
+        creates: /etc/rancher/k3s/k3s.yaml
 
 - name: Install and connect Tailscale on all nodes
   hosts: all
