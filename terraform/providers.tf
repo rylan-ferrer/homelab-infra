@@ -4,6 +4,9 @@ terraform {
       source  = "bpg/proxmox"
       version = "~> 0.85" # check registry.terraform.io/providers/bpg/proxmox for the current version
     }
+    local = {
+      source = "hashicorp/local"
+    }
   }
 }
 
