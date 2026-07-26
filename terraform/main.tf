@@ -31,7 +31,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
         address = "dhcp"
       }
     }
-    user_data_file_id = proxmox_virtual_environment_file.qemu_agent_config.id
+    user_data_file_id = proxmox_virtual_environment_file.qemu_agent_config["node3"].id
 
     user_account {
       username = "ubuntu"

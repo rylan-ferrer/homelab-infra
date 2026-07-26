@@ -1,7 +1,9 @@
 resource "proxmox_virtual_environment_file" "qemu_agent_config" {
+  for_each = toset(concat(local.control_plane_nodes, local.worker_nodes))
+
   content_type = "snippets"
   datastore_id = "local"
-  node_name    = var.proxmox_node_name
+  node_name    = each.value
 
   source_raw {
     data = <<-EOF
