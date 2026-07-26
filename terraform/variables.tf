@@ -17,7 +17,7 @@ variable "template_datastore_id" {
 }
 
 variable "vm_datastore_id" {
-  default = "nfs-shared"
+  default = "local-lvm"
 }
 
 variable "proxmox_api_token" {
