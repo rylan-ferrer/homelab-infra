@@ -21,5 +21,4 @@
 - name: Bring up Tailscale
       shell: "tailscale up --authkey={{ vault_tailscale_authkey }} --ssh"
       register: ts_result
-      changed_when: "'Success' in ts_result.stdout or ts_result.rc == 0"
-      failed_when: ts_result.rc != 0
+      changed_when: "'Success' in ts_result.stdout"
