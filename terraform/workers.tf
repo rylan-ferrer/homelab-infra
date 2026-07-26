@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
   }
 
   initialization {
-    user_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.worker_nodes[count.index]].id
+    vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.worker_nodes[count.index]].id
   }
 
   lifecycle {
