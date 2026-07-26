@@ -18,7 +18,8 @@
       args:
         creates: /usr/bin/tailscale
 
-    - name: Bring up Tailscale
+- name: Bring up Tailscale
       shell: "tailscale up --authkey={{ vault_tailscale_authkey }} --ssh"
-      args:
-        creates: /var/lib/tailscale/tailscaled.state
+      register: ts_result
+      changed_when: "'Success' in ts_result.stdout or ts_result.rc == 0"
+      failed_when: ts_result.rc != 0
