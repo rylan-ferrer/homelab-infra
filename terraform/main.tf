@@ -19,7 +19,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
   }
 
   disk {
-    datastore_id = var.vm_datastore_id
+    datastore_id = var.template_datastore_id
     file_id      = proxmox_download_file.ubuntu_cloud_image[each.value].id
     interface    = "scsi0"
     size         = 20

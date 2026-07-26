@@ -10,6 +10,12 @@ variable "image_datastore_id" {
   default     = "local"
 }
 
+variable "template_datastore_id" {
+  description = "Where template base disks live - stays local per-node, not moved to shared storage"
+  type        = string
+  default     = "local-lvm"
+}
+
 variable "vm_datastore_id" {
   default = "nfs-shared"
 }
