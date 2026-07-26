@@ -36,5 +36,9 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
       username = "ubuntu"
     keys = [trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))]
     }
+
+    agent { 
+      enabled = true
+    }
   }
 }
