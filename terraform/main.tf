@@ -31,14 +31,11 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
         address = "dhcp"
       }
     }
+    user_data_file_id = proxmox_virtual_environment_file.qemu_agent_config.id
 
     user_account {
       username = "ubuntu"
     keys = [trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))]
-    }
-
-    agent { 
-      enabled = true
     }
   }
 }
