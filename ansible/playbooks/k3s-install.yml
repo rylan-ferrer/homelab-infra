@@ -26,6 +26,19 @@
       args:
         creates: /etc/rancher/k3s/k3s.yaml
 
+- name: Join worker nodes
+  hosts: workers
+  become: true
+  vars:
+    k3s_url: "https://{{ hostvars['k3s-cp-1']['ansible_host'] }}:6443"
+    k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
+  tasks:
+    - name: Join as worker node
+      shell: |
+        curl -sfL https://get.k3s.io | sh -s - agent --server {{ k3s_url }} --token {{ k3s_token }}
+      args:
+        creates: /etc/rancher/k3s/agent
+
 - name: Install and connect Tailscale on all nodes
   hosts: all
   become: true
