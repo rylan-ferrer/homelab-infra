@@ -4,8 +4,9 @@ resource "proxmox_virtual_environment_vm" "worker" {
   node_name = local.worker_nodes[count.index]
 
 clone {
-    vm_id     = proxmox_virtual_environment_vm.ubuntu_template[local.worker_nodes[count.index]].vm_id
-    node_name = local.worker_nodes[count.index]
+    vm_id        = proxmox_virtual_environment_vm.ubuntu_template[local.worker_nodes[count.index]].vm_id
+    node_name    = local.worker_nodes[count.index]
+    datastore_id = var.vm_datastore_id
   }
 
   agent {
