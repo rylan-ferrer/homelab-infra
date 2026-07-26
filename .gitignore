@@ -17,6 +17,7 @@ terraform.rc
 *.retry
 .vault_pass
 hosts.yml
+ansible/inventory/hosts.yml
 
 # General
 .DS_Store
