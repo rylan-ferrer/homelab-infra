@@ -11,9 +11,7 @@ variable "image_datastore_id" {
 }
 
 variable "vm_datastore_id" {
-  description = "Where VM disks get stored - check Datacenter > Storage in the web UI"
-  type        = string
-  default     = "local-lvm"
+  default = "nfs-shared"
 }
 
 variable "proxmox_api_token" {
