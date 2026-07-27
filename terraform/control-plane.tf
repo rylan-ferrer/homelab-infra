@@ -35,7 +35,7 @@ clone {
       }
     }
     dns {
-      server = local.dns_servers
+      servers = local.dns_servers
     }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.control_plane_nodes[count.index]].id
   }
