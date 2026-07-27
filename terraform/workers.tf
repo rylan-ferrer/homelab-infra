@@ -28,6 +28,9 @@ initialization {
         gateway = local.gateway
       }
     }
+    dns {
+      servers = local.dns_servers
+    }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.worker_nodes[count.index]].id
   }
 
