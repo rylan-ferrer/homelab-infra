@@ -27,6 +27,11 @@ clone {
   }
 
   initialization {
+    ip_config {
+      ipv4 {
+        address = "${local.control_plane_ips[count.index]}/24"
+        gateway = local.gateway
+      }
+    }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.control_plane_nodes[count.index]].id
   }
-}

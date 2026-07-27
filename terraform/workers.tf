@@ -21,7 +21,13 @@ clone {
     dedicated = [10240, 10240, 10240, 14336][count.index]
   }
 
-  initialization {
+initialization {
+    ip_config {
+      ipv4 {
+        address = "${local.worker_ips[count.index]}/24"
+        gateway = local.gateway
+      }
+    }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.worker_nodes[count.index]].id
   }
 
