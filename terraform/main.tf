@@ -7,7 +7,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
   started   = false
 
   agent {
-    enabled = false
+    enabled = true
   }
 
   cpu {
