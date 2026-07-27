@@ -32,7 +32,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
   initialization {
     ip_config {
       ipv4 {
-        address = "192.168.0.${200 + countr.index}/24"
+        address = "192.168.0.${200 + count.index}/24"
         gateway = "192.168.0.1"
       }
     }
