@@ -30,12 +30,6 @@ resource "proxmox_virtual_environment_vm" "ubuntu_template" {
   }
 
   initialization {
-    ip_config {
-      ipv4 {
-        address = "192.168.0.${200 + count.index}/24"
-        gateway = "192.168.0.1"
-      }
-    }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[each.value].id
 
     user_account {
