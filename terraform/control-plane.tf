@@ -35,3 +35,4 @@ clone {
     }
     vendor_data_file_id = proxmox_virtual_environment_file.qemu_agent_config[local.control_plane_nodes[count.index]].id
   }
+}
