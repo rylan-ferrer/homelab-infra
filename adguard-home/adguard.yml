@@ -1,0 +1,78 @@
+# Deployment for AdGuard Home
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adguard-home
+  namespace: adguard-home
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.212
+spec:
+  selector:
+    matchLabels:
+      app: adguard-home
+  replicas: 1 
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: adguard-home
+    spec:
+      containers:
+      - name: adguard-home
+        image: adguard/adguardhome
+        args:
+          - --work-dir
+          - /opt/adguardhome/data/work
+          - --config 
+          - /opt/adguardhome/data/AdGuardHome.yaml
+        ports:
+        - containerPort: 3000
+          name: web
+          protocol: TCP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        - containerPort: 80
+          name: http-tcp
+          protocol: TCP
+        volumeMounts:
+        - name: adguard-home-storage
+          mountPath: /opt/adguardhome/data
+      volumes:
+        - name: adguard-home-storage
+          persistentVolumeClaim:
+            claimName: adguard-home-pvc
+
+---       
+# LoadBalancer Service for AdGuard Home
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard-home
+  namespace: adguard-home
+spec:
+  selector:
+    app: adguard-home
+  type: LoadBalancer
+  ports:
+    - name: dns-tcp
+      port: 53
+      targetPort: 53
+      protocol: TCP
+    - name: dns-udp
+      port: 53
+      targetPort: 53
+      protocol: UDP
+    - name: web
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+    - name: http-tcp
+      port: 8080
+      targetPort: 80
+      protocol: TCP
+
