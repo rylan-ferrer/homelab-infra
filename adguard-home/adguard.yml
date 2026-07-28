@@ -57,9 +57,9 @@ spec:
         image: adguard/adguardhome
         args:
           - --work-dir
-          - /data/work
+          - /adguard/data/work
           - --config 
-          - /data/AdGuardHome.yaml
+          - /adguard/data/AdGuardHome.yaml
         ports:
         - containerPort: 3000
           name: web
@@ -75,7 +75,7 @@ spec:
           protocol: TCP
         volumeMounts:
         - name: adguard-home-storage
-          mountPath: /data
+          mountPath: /adguard/data
       volumes:
         - name: adguard-home-storage
           persistentVolumeClaim:
