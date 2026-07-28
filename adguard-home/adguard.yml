@@ -1,3 +1,11 @@
+#Create a namespace for AdGuard Home
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: adguard-home
+
+
+---
 # Deployment for AdGuard Home
 apiVersion: apps/v1
 kind: Deployment
