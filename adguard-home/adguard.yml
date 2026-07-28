@@ -1,9 +1,36 @@
-#Create a namespace for AdGuard Home
 apiVersion: v1
-kind: Namespace
+kind: PersistentVolume
 metadata:
-  name: adguard-home
+  name: adguard-home-pv
+  namespace: adguard-home
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    path: /srv/nfs/k8s-apps
+    server: 192.168.0.202/24 
 
+
+---
+
+# PersistentVolumeClaim for AdGuard Home
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: adguard-home-pvc
+  namespace: adguard-home
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: k8-apps
+  resources:
+    requests:
+      storage: 5Gi
 
 ---
 # Deployment for AdGuard Home
