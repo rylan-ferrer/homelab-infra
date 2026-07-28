@@ -1,3 +1,13 @@
+- name: Install OS dependencies
+  hosts: all
+  become: true
+  tasks:
+    - name: Install nfs-common for Kubernetes PV mounts
+      apt:
+        name: nfs-common
+        state: present
+        update_cache: yes
+        
 - name: Initialize first control-plane node
   hosts: k3s-cp-1
   become: true
