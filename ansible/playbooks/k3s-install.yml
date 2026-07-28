@@ -64,6 +64,14 @@
       copy:
         src: "{{ playbook_dir }}/../../metallb/metallb.yml"
         dest: /tmp/metallb.yml
+    
+    - name: Install MetalLB controller and CRDs
+      shell: "k3s kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml"
+      register: metallb_install_result
+      changed_when: "'unchanged' not in metallb_install_result.stdout"
+
+    - name: Wait for MetalLB controller to be ready
+      shell: "k3s kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=90s"
 
     - name: Apply MetalLB manifest
       shell: "k3s kubectl apply -f /tmp/metallb.yml"
