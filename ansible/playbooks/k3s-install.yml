@@ -39,6 +39,37 @@
       args:
         creates: /etc/rancher/k3s/agent
 
+- name: Disable k3s built-in ServiceLB
+  hosts: control_plane
+  become: true
+  serial: 1
+  tasks:
+    - name: Write k3s config disabling servicelb
+      copy:
+        dest: /etc/rancher/k3s/config.yaml
+        content: |
+          disable:
+            - servicelb
+
+    - name: Restart k3s to apply config
+      systemd:
+        name: k3s
+        state: restarted
+
+- name: Deploy MetalLB
+  hosts: k3s-cp-1
+  become: true
+  tasks:
+    - name: Copy MetalLB manifest to control-plane node
+      copy:
+        src: "{{ playbook_dir }}/../../metallb/metallb.yml"
+        dest: /tmp/metallb.yml
+
+    - name: Apply MetalLB manifest
+      shell: "k3s kubectl apply -f /tmp/metallb.yml"
+      register: metallb_result
+      changed_when: "'unchanged' not in metallb_result.stdout"
+
 - name: Install and connect Tailscale on all nodes
   hosts: all
   become: true
