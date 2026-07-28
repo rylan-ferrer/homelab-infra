@@ -57,9 +57,9 @@ spec:
         image: adguard/adguardhome
         args:
           - --work-dir
-          - /opt/adguardhome/data/work
+          - /opt/adguard/data/work
           - --config 
-          - /opt/adguardhome/data/AdGuardHome.yaml
+          - /opt/adguard/data/AdGuardHome.yaml
         ports:
         - containerPort: 3000
           name: web
