@@ -78,7 +78,7 @@
       register: metallb_result
       changed_when: "'unchanged' not in metallb_result.stdout"
 
-- name: Copy kube-vip manifest to control-plane node
+    - name: Copy kube-vip manifest to control-plane node
       copy:
         src: "{{ playbook_dir }}/../../kube-vip/kube-vip.yml"
         dest: /tmp/kube-vip.yml
