@@ -10,10 +10,10 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: nfs-storage
+  storageClassName: k8s-apps
   nfs:
     path: /srv/nfs/k8s-apps
-    server: 192.168.0.202/24 
+    server: 192.168.0.202
 
 ---
 
