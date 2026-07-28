@@ -25,7 +25,7 @@ metadata:
   namespace: adguard-home
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   storageClassName: k8s-apps
   volumeName: adguard-home-pv
   resources:
