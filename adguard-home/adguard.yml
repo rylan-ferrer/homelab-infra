@@ -27,6 +27,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: k8s-apps
+  volumeName: adguard-home-pv
   resources:
     requests:
       storage: 5Gi
