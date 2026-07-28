@@ -78,6 +78,16 @@
       register: metallb_result
       changed_when: "'unchanged' not in metallb_result.stdout"
 
+- name: Copy kube-vip manifest to control-plane node
+      copy:
+        src: "{{ playbook_dir }}/../../kube-vip/kube-vip.yml"
+        dest: /tmp/kube-vip.yml
+
+    - name: Apply kube-vip manifest
+      shell: "k3s kubectl apply -f /tmp/kube-vip.yml"
+      register: kubevip_result
+      changed_when: "'unchanged' not in kubevip_result.stdout"
+
 - name: Install and connect Tailscale on all nodes
   hosts: all
   become: true
