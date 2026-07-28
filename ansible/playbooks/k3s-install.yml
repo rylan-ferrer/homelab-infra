@@ -44,12 +44,14 @@
   become: true
   serial: 1
   tasks:
-    - name: Write k3s config disabling servicelb
+    - name: Write k3s config
       copy:
         dest: /etc/rancher/k3s/config.yaml
         content: |
           disable:
             - servicelb
+          tls-san:
+            - "192.168.0.211"
 
     - name: Restart k3s to apply config
       systemd:
