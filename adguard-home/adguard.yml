@@ -11,7 +11,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: k8s-apps
   nfs:
-    path: /srv/nfs/k8s-apps
+    path: /srv/nfs/adguard-home
     server: 192.168.0.202
 
 ---
