@@ -36,3 +36,29 @@ variable "proxmox_endpoint" {
     description = "Node3 url"
     type = string
 }
+
+variable "gateway_ip" {
+  description = "Router gatway IP" 
+  type        = string
+  sensitive   = true      
+}
+
+variable "dns_ip" {
+  description = "IP for DNS resolution"
+  type        = list(string)
+  sensitive   = true      
+}
+
+
+variable "control_plane_ips" {
+  description = "IPs for control plane VMs"
+  type        = list(string)
+  sensitive   = true      
+}
+
+
+variable "worker_ips" {
+  description = "IPs for worker VMs"
+  type        = list(string)
+  sensitive   = true      
+}
