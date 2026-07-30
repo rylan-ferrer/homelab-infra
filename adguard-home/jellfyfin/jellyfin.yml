@@ -1,0 +1,69 @@
+# This is a PersistentVolumeClaim for JellyFin.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-pvc 
+  namespace: default
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage:  200Gi
+
+---
+
+# Deployment for JellyFin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      containers:
+        - name: jellyfin-ct
+          image: jellyfin/jellyfin:2026072708
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: jellyfin-pvc           
+              mountPath: /app/data       
+      volumes:
+        - name: jellyfin-pvc              
+          persistentVolumeClaim:
+            claimName: jellyfin-pvc
+
+---
+#LoadBalancer Service for JellyFin
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-svc
+  namespace: default
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.215
+spec:
+  type: LoadBalancer
+  selector: 
+    app: jellyfin
+  ports:
+    - port: 8096
+      targetPort: 8096
+      name: http
+      protocol: TCP
+    - port: 8920
+      targetPort: 8920
+      name: https
+      protocol: TCP
