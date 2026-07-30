@@ -38,8 +38,6 @@ kind: Deployment
 metadata:
   name: adguard-home
   namespace: adguard-home
-  annotations:
-    metallb.io/loadBalancerIPs: 192.168.0.213
 spec:
   selector:
     matchLabels:
@@ -88,6 +86,8 @@ kind: Service
 metadata:
   name: adguard-home
   namespace: adguard-home
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.213
 spec:
   selector:
     app: adguard-home
