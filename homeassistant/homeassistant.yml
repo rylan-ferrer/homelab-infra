@@ -1,0 +1,65 @@
+# This is a PersistentVolumeClaim for Home Assistant.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homeassistant-pvc 
+  namespace: default
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage:  5Gi
+
+---
+
+# Deployment for Home Assistant
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homeassistant-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homeassistant
+  template:
+    metadata:
+      labels:
+        app: homeassistant
+    spec:
+      containers:
+        - name: homeassistant-ct
+          image: homeassistant/home-assistant:2026.8.0b1
+          ports:
+            - containerPort: 8123
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: homeassistant-pvc           
+              mountPath: /homeassistant/app/data       
+      volumes:
+        - name: homeassistant-pvc              
+          persistentVolumeClaim:
+            claimName: homeassistant-pvc
+
+---
+#LoadBalancer Service for Home Assistant
+apiVersion: v1
+kind: Service
+metadata:
+  name: homeassistant-svc
+  namespace: default
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.216
+spec:
+  type: LoadBalancer
+  selector: 
+    app: homeassistant
+  ports:
+    - port: 80
+      targetPort: 8123
+      name: http
+      protocol: TCP
