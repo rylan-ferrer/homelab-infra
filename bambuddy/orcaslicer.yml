@@ -1,4 +1,4 @@
-# This is a PersistentVolumeClaim for Orca Scicer.
+# This is a PersistentVolumeClaim for Orca Slicer.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,7 +10,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage:  4Gi
+      storage: 4Gi
 
 ---
 
@@ -38,12 +38,8 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-          - name: orcaslicer-pvc
-            mountPath: /app/data
-      volumes:
-        - name: orcaslicer-pvc
-          persistentVolumeClaim:
-            claimName: orcaslicer-pvc
+            - name: orcaslicer-pvc
+              mountPath: /app/data
           readinessProbe:
             httpGet:
               path: /health
@@ -56,6 +52,10 @@ spec:
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 20
+      volumes:
+        - name: orcaslicer-pvc
+          persistentVolumeClaim:
+            claimName: orcaslicer-pvc
 
 ---
 # ClusterIP Service - internal only, Bambuddy talks to this pod-to-pod
