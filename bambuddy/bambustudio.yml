@@ -1,0 +1,75 @@
+# This is a PersistentVolumeClaim for Bambu Studio.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bambustudio-pvc
+  namespace: default
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+
+---
+
+# Deployment for the Bambu Studio sidecar (server-side slicing for BambuBuddy)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bambustudio-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bambustudio-api
+  template:
+    metadata:
+      labels:
+        app: bambustudio-api
+    spec:
+      containers:
+        - name: bambustudio-api-ct
+          image: ghcr.io/maziggy/bambu-studio-api
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: bambustudio-pvc
+              mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: bambustudio-pvc
+          persistentVolumeClaim:
+            claimName: bambustudio-pvc
+
+---
+# ClusterIP Service - internal only, Bambuddy talks to this pod-to-pod
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca-slicer-api-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: orca-slicer-api
+  ports:
+    - port: 3003
+      targetPort: 3000
+      name: http
+      protocol: TCP
