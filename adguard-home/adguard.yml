@@ -106,7 +106,7 @@ spec:
       targetPort: 3000
       protocol: TCP
     - name: http-tcp
-      port: 8080
+      port: 80
       targetPort: 80
       protocol: TCP
 
