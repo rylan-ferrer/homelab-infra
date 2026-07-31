@@ -47,6 +47,6 @@ spec:
     app: orca-slicer-api
   ports:
     - port: 3003
-      targetPort: 3003
+      targetPort: 3000
       name: http
       protocol: TCP
