@@ -89,9 +89,11 @@ patch_nodes_pm() {
   fi
 
   log "Patching $NODES_PM ..."
-  # Insert a thermalstate field right after the pveversion assignment line.
+  # Insert a thermalstate field right after the line that sets $res->{pveversion}.
+  # Matched loosely (anchor + end of statement) to tolerate formatting differences
+  # across PVE versions, rather than requiring an exact byte-for-byte match.
   perl -0pi -e '
-    s/(\$res->\{pveversion\}\s*=\s*PVE::pvecfg::package\(\)\s*\.\s*"\/"\s*\.\s*PVE::pvecfg::version_text\(\);)/$1\n\t$res->{thermalstate} = `sensors -j 2>\/dev\/null`;/s
+    s/(\$res->\{pveversion\}\s*=[^;]*;)/$1\n\t\$res->{thermalstate} = `sensors -j 2>\/dev\/null`;/s
   ' "$NODES_PM"
 
   if ! grep -q "thermalstate" "$NODES_PM"; then
