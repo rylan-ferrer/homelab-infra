@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: bambuddy-ct
-          image: maziggy/bambuddy:1.2.5.1
+          image: maziggy/bambuddy:latest
           ports:
             - containerPort: 8000
               name: http
