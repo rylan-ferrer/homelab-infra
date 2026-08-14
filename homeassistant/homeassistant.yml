@@ -30,6 +30,8 @@ spec:
       labels:
         app: homeassistant
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: homeassistant-ct
           image: homeassistant/home-assistant:2026.8.0b1
