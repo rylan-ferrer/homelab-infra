@@ -1,0 +1,6 @@
+# Format: <Rule-ID> <path/to/file>
+KSV-0009 kube-vip/kube-vip.yml
+KSV-0009 homeassistant/homeassistant.yml
+KSV-0056 kube-vip/kube-vip.yml
+KSV-0056 nfs-provisioner/nfs-provisioner.yml
+KSV-0119 kube-vip/kube-vip.yml
