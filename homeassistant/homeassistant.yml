@@ -30,6 +30,11 @@ spec:
       labels:
         app: homeassistant
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
@@ -41,7 +46,12 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: homeassistant-pvc           
-              mountPath: /homeassistant/app/data       
+              mountPath: /homeassistant/app/data     
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL  
       volumes:
         - name: homeassistant-pvc              
           persistentVolumeClaim:
