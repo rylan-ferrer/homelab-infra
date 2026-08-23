@@ -1,0 +1,11 @@
+# Allow host networking for Home Assistant device discovery and kube-vip VIP management
+KSV-0009
+
+# Allow writable root filesystem for system/stateful workloads
+KSV-0014
+
+# Allow required RBAC permissions for kube-vip and NFS provisioner
+KSV-0056
+
+# Allow NET_RAW capability for kube-vip ARP packets
+KSV-0119
