@@ -1,3 +1,4 @@
+#service account for the NFS Client Provisioner
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -37,7 +38,9 @@ roleRef:
   kind: ClusterRole
   name: nfs-client-provisioner-runner
   apiGroup: rbac.authorization.k8s.io
+
 ---
+#Deployment for the NFS Client Provisioner
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -55,6 +58,11 @@ spec:
       labels:
         app: nfs-client-provisioner
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
@@ -69,12 +77,19 @@ spec:
               value: 192.168.0.202
             - name: NFS_PATH
               value: /srv/nfs/k8s-apps
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: nfs-client-root
           nfs:
             server: 192.168.0.202
             path: /srv/nfs/k8s-apps
+
 ---
+#StorageClass for the NFS Client Provisioner
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
