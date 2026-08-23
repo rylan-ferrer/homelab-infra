@@ -1,6 +1,15 @@
 # Format: <Rule-ID> <path/to/file>
+
+#allow access to host network - per application
 KSV-0009 kube-vip/kube-vip.yml
 KSV-0009 homeassistant/homeassistant.yml
+
+#allo access to manage networking resources
 KSV-0056 kube-vip/kube-vip.yml
 KSV-0056 nfs-provisioner/nfs-provisioner.yml
+
+#Allow kube-vip to see newtork traffic 
 KSV-0119 kube-vip/kube-vip.yml
+
+# Allow writable root filesystem for Home Assistant state/logs
+KSV-0014 homeassistant/homeassistant.yml
