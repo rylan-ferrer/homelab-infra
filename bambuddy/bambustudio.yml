@@ -29,6 +29,11 @@ spec:
     metadata:
       labels:
         app: bambustudio-api
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
     spec:
       containers:
         - name: bambustudio-api-ct
@@ -52,6 +57,12 @@ spec:
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: bambustudio-pvc
           persistentVolumeClaim:
