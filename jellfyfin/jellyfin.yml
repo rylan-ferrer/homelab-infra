@@ -30,6 +30,11 @@ spec:
       labels:
         app: jellyfin
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: jellyfin-ct
           image: jellyfin/jellyfin:2026072708
@@ -40,6 +45,12 @@ spec:
           volumeMounts:
             - name: jellyfin-pvc           
               mountPath: /app/data       
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: jellyfin-pvc              
           persistentVolumeClaim:
