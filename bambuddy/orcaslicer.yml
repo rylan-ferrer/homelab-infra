@@ -30,6 +30,11 @@ spec:
       labels:
         app: orca-slicer-api
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: orca-slicer-api-ct
           image: ghcr.io/maziggy/orca-slicer-api:latest
@@ -52,6 +57,12 @@ spec:
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: orcaslicer-pvc
           persistentVolumeClaim:
