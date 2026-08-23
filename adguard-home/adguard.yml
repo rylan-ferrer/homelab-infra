@@ -50,6 +50,11 @@ spec:
       labels:
         app: adguard-home
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: adguard-home
         image: adguard/adguardhome
@@ -74,6 +79,12 @@ spec:
         volumeMounts:
         - name: adguard-home-storage
           mountPath: /adguard/data
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
       volumes:
         - name: adguard-home-storage
           persistentVolumeClaim:
