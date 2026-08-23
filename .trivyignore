@@ -13,3 +13,6 @@ KSV-0119 kube-vip/kube-vip.yml
 
 # Allow writable root filesystem for Home Assistant state/logs
 KSV-0014 homeassistant/homeassistant.yml
+
+# kube-vip requires elevated permissions to manage host VIPs and network tables
+KSV-0118 kube-vip/kube-vip.yml
