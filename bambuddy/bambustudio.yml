@@ -29,12 +29,12 @@ spec:
     metadata:
       labels:
         app: bambustudio-api
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: bambustudio-api-ct
           image: ghcr.io/maziggy/bambu-studio-api
