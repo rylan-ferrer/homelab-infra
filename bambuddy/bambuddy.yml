@@ -39,7 +39,13 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: bambuddy-pvc           
-              mountPath: /app/data       
+              mountPath: /app/data
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: bambuddy-pvc              
           persistentVolumeClaim:
