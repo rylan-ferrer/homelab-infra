@@ -101,7 +101,7 @@ spec:
               service:
                 name: jellyfin-svc
                 port:
-                  number: 8096
+                  number: 80
   tls:
     - hosts:
         - jellyfin.outrunjanko.com
