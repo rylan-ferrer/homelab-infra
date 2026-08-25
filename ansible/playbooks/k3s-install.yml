@@ -24,17 +24,17 @@
       register: node_token_raw
 
     - name: Deploy cert-manager CRDs and controller
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml
       changed_when: true
 
     - name: Wait for cert-manager webhook to become available
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=60s
       changed_when: false
 
     - name: Create Cloudflare API token secret
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: >
           kubectl create secret generic cloudflare-api-token-secret
           --namespace cert-manager
@@ -43,7 +43,7 @@
       changed_when: true
 
     - name: Apply Let's Encrypt ClusterIssuer
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: |
           cat <<EOF | kubectl apply -f -
           apiVersion: cert-manager.io/v1
@@ -66,12 +66,12 @@
       changed_when: true
 
     - name: Deploy Cloudflare Tunnel namespace
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: kubectl create namespace cloudflared --dry-run=client -o yaml | kubectl apply -f -
       changed_when: true
 
     - name: Deploy Cloudflare Tunnel Secret
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: >
           kubectl create secret generic tunnel-token
           --namespace cloudflared
@@ -80,7 +80,7 @@
       changed_when: true
 
     - name: Deploy Cloudflare Tunnel Connector
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: |
           cat <<EOF | kubectl apply -f -
           apiVersion: apps/v1
