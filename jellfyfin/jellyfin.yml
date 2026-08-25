@@ -78,3 +78,31 @@ spec:
       targetPort: 8920
       name: https
       protocol: TCP
+
+
+---
+
+#Ingress for JellyFin
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: jellyfin.outrunjanko.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin-svc
+                port:
+                  number: 8096
+  tls:
+    - hosts:
+        - jellyfin.outrunjanko.com
+      secretName: jellyfin-outrunjanko-tls
