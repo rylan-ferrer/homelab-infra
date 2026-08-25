@@ -5,43 +5,39 @@ Repo to house my infrastructure for my homelab
 ## Architecture Overview
 
 ```mermaid
-flowchart TB
-    subgraph Proxmox_VE["Proxmox VE Host"]
-        direction TB
-        SetupScripts["setup-scripts/<br>• proxmox-node-setup.sh<br>• pve-cpu-temp.sh"]
+flowchart TD
+    %% Custom Styling
+    classDef hypervisor fill:#2d3748,stroke:#4a5568,stroke-width:2px,color:#fff;
+    classDef infra fill:#2b6cb0,stroke:#2c5282,stroke-width:2px,color:#fff;
+    classDef platform fill:#2f855a,stroke:#276749,stroke-width:2px,color:#fff;
+    classDef app fill:#4a5568,stroke:#718096,stroke-width:1px,color:#fff;
 
-        subgraph VM_Infra["Terraform & Cloud-Init Provisioning"]
-            direction LR
-            CP_VM["Control-Plane VM(s)<br>(control-plane.tf)"]
-            Worker_VM["Worker VM(s)<br>(workers.tf)"]
-        end
+    subgraph Layer1 ["1. Bare Metal & Hypervisor"]
+        PVE["Proxmox VE Host<br><small>setup-scripts/ (Host configs & temp tracking)</small>"]:::hypervisor
     end
 
-    subgraph K3s_Cluster["K3s Kubernetes Cluster"]
-        direction TB
-
-        subgraph Core_Services["Cluster Networking & Services"]
-            KubeVIP["kube-vip<br>(VIP / HA)"]
-            MetalLB["MetalLB<br>(LoadBalancer)"]
-            CertManager["cert-manager<br>(Let's Encrypt Prod)"]
-            NFS["NFS Provisioner<br>(Persistent Storage)"]
-        end
-
-        subgraph Workloads["Deployed Applications & Workloads"]
-            AdGuard["AdGuard Home"]
-            HA["Home Assistant"]
-            Jellyfin["Jellyfin Media Server"]
-            Minecraft["Minecraft Server"]
-            subgraph Bambu_Stack["3D Printing Tools"]
-                Bambuddy["Bambuddy"]
-                BambuStudio["Bambu Studio"]
-                OrcaSlicer["OrcaSlicer"]
-            end
-        end
+    subgraph Layer2 ["2. Automation & VM Provisioning"]
+        TF["Terraform & Cloud-Init<br><small>Provisions Control-Plane & Worker VMs</small>"]:::infra
+        ANS["Ansible Playbooks<br><small>Installs & configures k3s cluster</small>"]:::infra
     end
 
-    Ansible["Ansible Automation<br>(k3s-install.yml)"] -->|Deploys & Configures| K3s_Cluster
-    VM_Infra -->|Runs on| Proxmox_VE
-    K3s_Cluster -->|Hosted within VMs| VM_Infra
-    Core_Services -.->|Provides Services & Storage| Workloads
+    subgraph Layer3 ["3. K3s Kubernetes Platform"]
+        VIP["kube-vip<br><small>Virtual IP / HA</small>"]:::platform
+        MLB["MetalLB<br><small>Load Balancer</small>"]:::platform
+        CERT["cert-manager<br><small>Let's Encrypt TLS</small>"]:::platform
+        NFS["nfs-provisioner<br><small>Dynamic PVC Storage</small>"]:::platform
+    end
+
+    subgraph Layer4 ["4. Application Workloads"]
+        direction LR
+        APP_NET["Network & Smart Home<br>• AdGuard Home<br>• Home Assistant"]:::app
+        APP_MEDIA["Media & Games<br>• Jellyfin<br>• Minecraft Server"]:::app
+        APP_PRINT["3D Printing Tools<br>• Bambuddy<br>• Bambu Studio<br>• OrcaSlicer"]:::app
+    end
+
+    %% Flow Connections
+    PVE --> TF
+    TF --> ANS
+    ANS --> Layer3
+    Layer3 --> Layer4
 ```
