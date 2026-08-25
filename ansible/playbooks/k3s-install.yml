@@ -65,6 +65,59 @@
       EOF
   changed_when: true
 
+- name: Deploy Cloudflare Tunnel namespace
+  ansible.builtin.command:
+    cmd: kubectl create namespace cloudflared --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: true
+
+- name: Deploy Cloudflare Tunnel Secret
+  ansible.builtin.command:
+    cmd: >
+      kubectl create secret generic tunnel-token
+      --namespace cloudflared
+      --from-literal=token={{ cloudflare_tunnel_token }}
+      --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: true
+
+- name: Deploy Cloudflare Tunnel Connector
+  ansible.builtin.command:
+    cmd: |
+      cat <<EOF | kubectl apply -f -
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: cloudflared
+        namespace: cloudflared
+        labels:
+          app: cloudflared
+      spec:
+        replicas: 2
+        selector:
+          matchLabels:
+            app: cloudflared
+        template:
+          metadata:
+            labels:
+              app: cloudflared
+          spec:
+            containers:
+            - name: cloudflared
+              image: cloudflare/cloudflared:latest
+              args:
+              - tunnel
+              - --no-autoupdate
+              - run
+              - --token
+              - \$(TUNNEL_TOKEN)
+              env:
+              - name: TUNNEL_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: tunnel-token
+                    key: token
+      EOF
+  changed_when: true
+
 - name: Join remaining control-plane nodes
   hosts: k3s-cp-2:k3s-cp-3
   become: true
