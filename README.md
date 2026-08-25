@@ -98,6 +98,6 @@ flowchart TD
     CP_NODES <-->|Flannel / CNI Overlay| WORKER_NODES
     WORKER_NODES --- K8S_SERVICES
 
-    K8S_SERVICES -.->|Persistent Volumes (RWX/RWO)| NFS_PROV
+    K8S_SERVICES -.->|"Persistent Volumes (RWX/RWO)"| NFS_PROV
     NFS_PROV <-->|NFS Protocol :2049| NFS_SERVER
 ```
