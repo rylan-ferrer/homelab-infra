@@ -23,100 +23,100 @@
         src: /var/lib/rancher/k3s/server/node-token
       register: node_token_raw
 
-- name: Deploy cert-manager CRDs and controller
-  ansible.builtin.command:
-    cmd: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml
-  changed_when: true
+    - name: Deploy cert-manager CRDs and controller
+      ansible.builtin.command:
+        cmd: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml
+      changed_when: true
 
-- name: Wait for cert-manager webhook to become available
-  ansible.builtin.command:
-    cmd: kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=60s
-  changed_when: false
+    - name: Wait for cert-manager webhook to become available
+      ansible.builtin.command:
+        cmd: kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=60s
+      changed_when: false
 
-- name: Create Cloudflare API token secret
-  ansible.builtin.command:
-    cmd: >
-      kubectl create secret generic cloudflare-api-token-secret
-      --namespace cert-manager
-      --from-literal=api-token={{ cloudflare_api_token }}
-      --dry-run=client -o yaml | kubectl apply -f -
-  changed_when: true
+    - name: Create Cloudflare API token secret
+      ansible.builtin.command:
+        cmd: >
+          kubectl create secret generic cloudflare-api-token-secret
+          --namespace cert-manager
+          --from-literal=api-token={{ cloudflare_api_token }}
+          --dry-run=client -o yaml | kubectl apply -f -
+      changed_when: true
 
-- name: Apply Let's Encrypt ClusterIssuer
-  ansible.builtin.command:
-    cmd: |
-      cat <<EOF | kubectl apply -f -
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: letsencrypt-prod
-      spec:
-        acme:
-          email: {{ acme_email }}
-          server: https://acme-v02.api.letsencrypt.org/directory
-          privateKeySecretRef:
-            name: letsencrypt-prod-account-key
-          solvers:
-            - dns01:
-                cloudflare:
-                  apiTokenSecretRef:
-                    name: cloudflare-api-token-secret
-                    key: api-token
-      EOF
-  changed_when: true
-
-- name: Deploy Cloudflare Tunnel namespace
-  ansible.builtin.command:
-    cmd: kubectl create namespace cloudflared --dry-run=client -o yaml | kubectl apply -f -
-  changed_when: true
-
-- name: Deploy Cloudflare Tunnel Secret
-  ansible.builtin.command:
-    cmd: >
-      kubectl create secret generic tunnel-token
-      --namespace cloudflared
-      --from-literal=token={{ cloudflare_tunnel_token }}
-      --dry-run=client -o yaml | kubectl apply -f -
-  changed_when: true
-
-- name: Deploy Cloudflare Tunnel Connector
-  ansible.builtin.command:
-    cmd: |
-      cat <<EOF | kubectl apply -f -
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: cloudflared
-        namespace: cloudflared
-        labels:
-          app: cloudflared
-      spec:
-        replicas: 2
-        selector:
-          matchLabels:
-            app: cloudflared
-        template:
+    - name: Apply Let's Encrypt ClusterIssuer
+      ansible.builtin.command:
+        cmd: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: cert-manager.io/v1
+          kind: ClusterIssuer
           metadata:
+            name: letsencrypt-prod
+          spec:
+            acme:
+              email: {{ acme_email }}
+              server: https://acme-v02.api.letsencrypt.org/directory
+              privateKeySecretRef:
+                name: letsencrypt-prod-account-key
+              solvers:
+                - dns01:
+                    cloudflare:
+                      apiTokenSecretRef:
+                        name: cloudflare-api-token-secret
+                        key: api-token
+          EOF
+      changed_when: true
+
+    - name: Deploy Cloudflare Tunnel namespace
+      ansible.builtin.command:
+        cmd: kubectl create namespace cloudflared --dry-run=client -o yaml | kubectl apply -f -
+      changed_when: true
+
+    - name: Deploy Cloudflare Tunnel Secret
+      ansible.builtin.command:
+        cmd: >
+          kubectl create secret generic tunnel-token
+          --namespace cloudflared
+          --from-literal=token={{ cloudflare_tunnel_token }}
+          --dry-run=client -o yaml | kubectl apply -f -
+      changed_when: true
+
+    - name: Deploy Cloudflare Tunnel Connector
+      ansible.builtin.command:
+        cmd: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: cloudflared
+            namespace: cloudflared
             labels:
               app: cloudflared
           spec:
-            containers:
-            - name: cloudflared
-              image: cloudflare/cloudflared:latest
-              args:
-              - tunnel
-              - --no-autoupdate
-              - run
-              - --token
-              - \$(TUNNEL_TOKEN)
-              env:
-              - name: TUNNEL_TOKEN
-                valueFrom:
-                  secretKeyRef:
-                    name: tunnel-token
-                    key: token
-      EOF
-  changed_when: true
+            replicas: 2
+            selector:
+              matchLabels:
+                app: cloudflared
+            template:
+              metadata:
+                labels:
+                  app: cloudflared
+              spec:
+                containers:
+                - name: cloudflared
+                  image: cloudflare/cloudflared:latest
+                  args:
+                  - tunnel
+                  - --no-autoupdate
+                  - run
+                  - --token
+                  - \$(TUNNEL_TOKEN)
+                  env:
+                  - name: TUNNEL_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: tunnel-token
+                        key: token
+          EOF
+      changed_when: true
 
 - name: Join remaining control-plane nodes
   hosts: k3s-cp-2:k3s-cp-3
