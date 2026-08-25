@@ -2,7 +2,9 @@
 Repo to house my infrastructure for my homelab 
 
 
-## Architecture Overview
+## Architecture
+
+### System Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -42,7 +44,9 @@ flowchart TD
     Layer3 --> Layer4
 ```
 
-### Network Architecture Overview 
+---
+
+### Network Flow Architecture
 
 ```mermaid
 flowchart TD
