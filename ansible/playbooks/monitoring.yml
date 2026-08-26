@@ -60,6 +60,8 @@
                       requests:
                         storage: 20Gi
           grafana:
+            initChownData:
+              enabled: false
             persistence:
               enabled: true
               storageClassName: "nfs-client"
