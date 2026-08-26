@@ -1,0 +1,78 @@
+---
+- name: 📊 Deploy Monitoring Stack & Proxmox Exporter
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    kubeconfig_path: "~/.kube/config"
+
+  tasks:
+    - name: 📁 Ensure monitoring namespace exists
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: monitoring
+
+    - name: 🔐 Create PVE Exporter secret configuration
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: pve-exporter-config
+            namespace: monitoring
+          type: Opaque
+          stringData:
+            pve.yml: |
+              default:
+                user: "{{ vault_pve_exporter_user }}"
+                token_name: "{{ vault_pve_exporter_token_name }}"
+                token_value: "{{ vault_pve_exporter_token_value }}"
+                verify_ssl: false
+
+    - name: 📦 Add Prometheus Community Helm repo
+      kubernetes.core.helm_repository:
+        name: prometheus-community
+        repo_url: "https://prometheus-community.github.io/helm-charts"
+
+    - name: ⚡ Deploy kube-prometheus-stack via Helm
+      kubernetes.core.helm:
+        name: kube-prometheus-stack
+        chart_ref: prometheus-community/kube-prometheus-stack
+        release_namespace: monitoring
+        kubeconfig: "{{ kubeconfig_path }}"
+        values:
+          prometheus:
+            prometheusSpec:
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: "nfs-client"
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 20Gi
+          grafana:
+            persistence:
+              enabled: true
+              storageClassName: "nfs-client"
+              size: 5Gi
+
+    - name: 🚢 Deploy PVE Exporter Deployment and Service
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        src: "../../pve-exporter/pve-exporter.yml"
+
+    - name: 🎯 Apply PVE ServiceMonitor
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        src: "../../pve-exporter/pve-servicemonitor.yml"

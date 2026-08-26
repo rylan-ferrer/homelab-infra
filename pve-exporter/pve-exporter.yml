@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pve-exporter
+  namespace: monitoring
+  labels:
+    app: pve-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pve-exporter
+  template:
+    metadata:
+      labels:
+        app: pve-exporter
+    spec:
+      containers:
+        - name: pve-exporter
+          image: propertyshelf/prometheus-pve-exporter:latest
+          args:
+            - "--config.file=/etc/prometheus-pve-exporter/pve.yml"
+          ports:
+            - name: metrics
+              containerPort: 9221
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus-pve-exporter
+              readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: pve-exporter-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pve-exporter
+  namespace: monitoring
+  labels:
+    app: pve-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: 9221
+      targetPort: 9221
+  selector:
+    app: pve-exporter

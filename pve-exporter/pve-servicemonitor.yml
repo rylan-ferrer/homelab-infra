@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pve-exporter
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: pve-exporter
+  endpoints:
+    - port: metrics
+      path: /pve
+      interval: 30s
+      scrapeTimeout: 20s
+      params:
+        target:
+          - "192.168.1.10"  # Replace with Proxmox Node 1 IP/FQDN
+          - "192.168.1.11"  # Replace with Proxmox Node 2 IP/FQDN
+      metricRelabelings:
+        - targetLabel: instance
+          replacement: "$1"
