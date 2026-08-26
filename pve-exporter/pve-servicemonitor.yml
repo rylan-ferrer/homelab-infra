@@ -16,8 +16,10 @@ spec:
       scrapeTimeout: 20s
       params:
         target:
-          - "192.168.1.10"  # Replace with Proxmox Node 1 IP/FQDN
-          - "192.168.1.11"  # Replace with Proxmox Node 2 IP/FQDN
+          - "192.168.0.200"  # Replace with Proxmox Node 1 IP/FQDN
+          - "192.168.0.201"  # Replace with Proxmox Node 2 IP/FQDN
+          - "192.168.0.202"  # Replace with Proxmox Node 3 IP/FQDN
+          - "192.168.0.203"  # Replace with Proxmox Node 4 IP/FQDN
       metricRelabelings:
         - targetLabel: instance
           replacement: "$1"
