@@ -26,12 +26,6 @@ spec:
           volumeMounts:
             - name: bambuddy-pvc           
               mountPath: /app/data
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
       volumes:
         - name: bambuddy-pvc              
           persistentVolumeClaim:
@@ -78,12 +72,6 @@ spec:
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 20
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
       volumes:
         - name: bambustudio-pvc
           persistentVolumeClaim:
