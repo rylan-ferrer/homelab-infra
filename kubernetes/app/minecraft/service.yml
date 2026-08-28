@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-service
+  namespace: minecraft
+  labels:
+    app: minecraft-server
+spec:
+  type: LoadBalancer # Exposed directly on your local network pool via MetalLB
+  ports:
+    - name: minecraft
+      port: 25565
+      targetPort: 25565
+      protocol: TCP
+  selector:
+    app: minecraft-server
