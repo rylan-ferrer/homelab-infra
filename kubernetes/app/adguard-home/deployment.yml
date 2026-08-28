@@ -50,6 +50,8 @@ spec:
           capabilities:
             drop:
               - ALL
+            add:
+              - NET_BIND_SERVICE
       volumes:
         - name: adguard-home-storage
           persistentVolumeClaim:
