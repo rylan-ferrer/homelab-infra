@@ -14,11 +14,11 @@ spec:
       storage:  15Gi
 
 ---
-# PVC for Orcaslicer
+# PVC for Bambu Studio
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: orcaslicer-pvc
+  name: bambustudio-pvc
   namespace: default
 spec:
   storageClassName: nfs-client

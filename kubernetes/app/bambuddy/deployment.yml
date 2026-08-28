@@ -41,21 +41,21 @@ spec:
             claimName: bambuddy-pvc
 
 ---
-# Deployment for the OrcaSlicer sidecar (server-side slicing for BambuBuddy)
+# Deployment for the Bambu Studio sidecar (server-side slicing for BambuBuddy)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orca-slicer-api
+  name: bambustudio-api
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orca-slicer-api
+      app: bambustudio-api
   template:
     metadata:
       labels:
-        app: orca-slicer-api
+        app: bambustudio-api
     spec:
       securityContext:
         runAsNonRoot: true
@@ -63,14 +63,14 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
       containers:
-        - name: orca-slicer-api-ct
-          image: ghcr.io/maziggy/orca-slicer-api:latest
+        - name: bambustudio-api-ct
+          image: ghcr.io/maziggy/bambu-studio-api
           ports:
             - containerPort: 3000
               name: http
               protocol: TCP
           volumeMounts:
-            - name: orcaslicer-pvc
+            - name: bambustudio-pvc
               mountPath: /app/data
           readinessProbe:
             httpGet:
@@ -91,8 +91,8 @@ spec:
               drop:
                 - ALL
       volumes:
-        - name: orcaslicer-pvc
+        - name: bambustudio-pvc
           persistentVolumeClaim:
-            claimName: orcaslicer-pvc
+            claimName: bambustudio-pvc
 
 
