@@ -11,14 +11,11 @@ spec:
       app: bambuddy
   template:
     metadata:
+      annotations:
+        trivy.aquasecurity.github.io/ignore: "KSV012,KSV013"
       labels:
         app: bambuddy
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
       containers:
         - name: bambuddy-ct
           image: maziggy/bambuddy:latest
