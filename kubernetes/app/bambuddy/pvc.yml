@@ -1,0 +1,29 @@
+---
+#PVC for BamBuddy
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bambuddy-pvc 
+  namespace: default
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage:  15Gi
+
+---
+# PVC for Orcaslicer
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: orcaslicer-pvc
+  namespace: default
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi

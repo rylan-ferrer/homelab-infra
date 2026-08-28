@@ -1,0 +1,34 @@
+#LoadBalancer Service for BambuBuddy
+apiVersion: v1
+kind: Service
+metadata:
+  name: bambuddy-svc
+  namespace: default
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.214
+spec:
+  type: LoadBalancer
+  selector: 
+    app: bambuddy
+  ports:
+    - port: 80
+      targetPort: 8000
+      name: http
+      protocol: TCP
+
+---
+# ClusterIP Service - internal only, Bambuddy talks to this pod-to-pod
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca-slicer-api-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: orca-slicer-api
+  ports:
+    - port: 3003
+      targetPort: 3000
+      name: http
+      protocol: TCP

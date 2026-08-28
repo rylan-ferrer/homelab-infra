@@ -1,19 +1,46 @@
-# This is a PersistentVolumeClaim for Orca Slicer.
-apiVersion: v1
-kind: PersistentVolumeClaim
+# Deployment for BambuBuddy
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: orcaslicer-pvc
+  name: bambuddy-app
   namespace: default
 spec:
-  storageClassName: nfs-client
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 4Gi
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bambuddy
+  template:
+    metadata:
+      labels:
+        app: bambuddy
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: bambuddy-ct
+          image: maziggy/bambuddy:latest
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: bambuddy-pvc           
+              mountPath: /app/data
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: bambuddy-pvc              
+          persistentVolumeClaim:
+            claimName: bambuddy-pvc
 
 ---
-
 # Deployment for the OrcaSlicer sidecar (server-side slicing for BambuBuddy)
 apiVersion: apps/v1
 kind: Deployment
@@ -68,19 +95,4 @@ spec:
           persistentVolumeClaim:
             claimName: orcaslicer-pvc
 
----
-# ClusterIP Service - internal only, Bambuddy talks to this pod-to-pod
-apiVersion: v1
-kind: Service
-metadata:
-  name: orca-slicer-api-svc
-  namespace: default
-spec:
-  type: ClusterIP
-  selector:
-    app: orca-slicer-api
-  ports:
-    - port: 3003
-      targetPort: 3000
-      name: http
-      protocol: TCP
+
