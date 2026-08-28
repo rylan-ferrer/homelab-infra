@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-svc
+  namespace: default
+  annotations:
+    metallb.io/loadBalancerIPs: 192.168.0.215
+spec:
+  type: LoadBalancer
+  selector: 
+    app: jellyfin
+  ports:
+    - port: 80
+      targetPort: 8096
+      name: http
+      protocol: TCP
+    - port: 8920
+      targetPort: 8920
+      name: https
+      protocol: TCP

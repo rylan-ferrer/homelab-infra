@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-jellyfin-ratelimit@kubernetescrd
+spec:
+  rules:
+    - host: jellyfin.outrunjanko.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin-svc
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - jellyfin.outrunjanko.com
+      secretName: jellyfin-outrunjanko-tls
