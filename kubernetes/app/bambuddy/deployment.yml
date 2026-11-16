@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bambuddy-app
-  namespace: bambuddy
+  namespace: default
 spec:
   replicas: 1
   strategy:
@@ -59,7 +59,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bambustudio-api
-  namespace: bambuddy
+  namespace: default
 spec:
   replicas: 1
   strategy:

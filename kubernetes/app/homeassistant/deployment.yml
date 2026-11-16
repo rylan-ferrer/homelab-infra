@@ -24,7 +24,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: homeassistant-ct
-          image: homeassistant/home-assistant:2026.8.0
+          image: homeassistant/home-assistant:2026.8.0b1
           ports:
             - containerPort: 8123
               name: http

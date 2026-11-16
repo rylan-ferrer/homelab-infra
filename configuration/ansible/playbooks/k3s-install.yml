@@ -31,12 +31,10 @@
 - name: Initialize first control-plane node
   hosts: k3s-cp-1
   become: true
-  vars:
-    k3s_version: "v1.32.2+k3s1"
   tasks:
     - name: Install k3s as cluster-init server
       shell: |
-        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - server --cluster-init
+        curl -sfL https://get.k3s.io | sh -s - server --cluster-init
       args:
         creates: /etc/rancher/k3s/k3s.yaml
 
@@ -139,7 +137,7 @@
               spec:
                 containers:
                 - name: cloudflared
-                  image: cloudflare/cloudflared:2025.2.1
+                  image: cloudflare/cloudflared:latest
                   args:
                   - tunnel
                   - --no-autoupdate
@@ -159,13 +157,12 @@
   hosts: k3s-cp-2:k3s-cp-3
   become: true
   vars:
-    k3s_version: "v1.32.2+k3s1"
     k3s_url: "https://{{ hostvars['k3s-cp-1']['ansible_host'] }}:6443"
     k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
   tasks:
     - name: Join as additional control-plane node
       shell: |
-        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - server --server {{ k3s_url }} --token {{ k3s_token }}
+        curl -sfL https://get.k3s.io | sh -s - server --server {{ k3s_url }} --token {{ k3s_token }}
       args:
         creates: /etc/rancher/k3s/k3s.yaml
       no_log: true
@@ -174,14 +171,13 @@
   hosts: workers
   become: true
   vars:
-    k3s_version: "v1.32.2+k3s1"
     k3s_vip: "192.168.0.211"
     k3s_url: "https://{{ k3s_vip }}:6443"
     k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
   tasks:
     - name: Join as worker node
       shell: |
-        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - agent --server {{ k3s_url }} --token {{ k3s_token }}
+        curl -sfL https://get.k3s.io | sh -s - agent --server {{ k3s_url }} --token {{ k3s_token }}
       args:
         creates: /etc/rancher/k3s/agent
       no_log: true

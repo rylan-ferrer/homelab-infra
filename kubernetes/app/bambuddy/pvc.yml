@@ -4,7 +4,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: bambuddy-pvc 
-  namespace: bambuddy
+  namespace: default
 spec:
   storageClassName: nfs-client
   accessModes:
@@ -19,7 +19,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: bambustudio-pvc
-  namespace: bambuddy
+  namespace: default
 spec:
   storageClassName: nfs-client
   accessModes:

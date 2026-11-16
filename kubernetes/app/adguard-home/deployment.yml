@@ -22,7 +22,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: adguard-home
-        image: adguard/adguardhome:v0.107.57
+        image: adguard/adguardhome
         args:
           - --work-dir
           - /adguard/data/work

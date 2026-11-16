@@ -15,13 +15,9 @@ spec:
       labels:
         app: pve-exporter
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
       containers:
         - name: pve-exporter
-          image: prompve/prometheus-pve-exporter:v3.5.1
+          image: prompve/prometheus-pve-exporter:latest
           args:
             - "--config.file=/etc/prometheus-pve-exporter/pve.yml"
           ports:
@@ -34,12 +30,6 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus-pve-exporter
