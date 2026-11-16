@@ -19,6 +19,9 @@ spec:
       containers:
         - name: bambuddy-ct
           image: maziggy/bambuddy:latest
+          env:
+            - name: TZ
+              value: "America/Los_Angeles"
           ports:
             - containerPort: 8000
               name: http
@@ -76,5 +79,3 @@ spec:
         - name: bambustudio-pvc
           persistentVolumeClaim:
             claimName: bambustudio-pvc
-
-
