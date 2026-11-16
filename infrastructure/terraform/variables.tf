@@ -17,7 +17,15 @@ variable "template_datastore_id" {
 }
 
 variable "vm_datastore_id" {
-  default = "local-lvm"
+  description = "Datastore where cloned VM disks are placed"
+  type        = string
+  default     = "local-lvm"
+}
+
+variable "ssh_public_key_path" {
+  description = "Path to the SSH public key injected into cloud-init templates"
+  type        = string
+  default     = "~/.ssh/id_ed25519.pub"
 }
 
 variable "proxmox_api_token" {

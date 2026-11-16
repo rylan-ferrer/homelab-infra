@@ -6,6 +6,8 @@ metadata:
   namespace: default
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: bambuddy
@@ -26,6 +28,23 @@ spec:
             - containerPort: 8000
               name: http
               protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
           volumeMounts:
             - name: bambuddy-pvc           
               mountPath: /app/data
@@ -43,6 +62,8 @@ metadata:
   namespace: default
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: bambustudio-api
@@ -55,11 +76,18 @@ spec:
     spec:
       containers:
         - name: bambustudio-api-ct
-          image: ghcr.io/maziggy/bambu-studio-api
+          image: ghcr.io/maziggy/bambu-studio-api:latest
           ports:
             - containerPort: 3000
               name: http
               protocol: TCP
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
           volumeMounts:
             - name: bambustudio-pvc
               mountPath: /app/data

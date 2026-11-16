@@ -1,18 +1,18 @@
 # Format: <Rule-ID> <path/to/file>
 
-#allow access to host network - per application
-KSV-0009 kube-vip/kube-vip.yml
-KSV-0009 homeassistant/homeassistant.yml
+# Allow access to host network - per application
+KSV-0009 kubernetes/core/kube-vip/kube-vip.yml
+KSV-0009 kubernetes/app/homeassistant/deployment.yml
 
-#allo access to manage networking resources
-KSV-0056 kube-vip/kube-vip.yml
-KSV-0056 nfs-provisioner/nfs-provisioner.yml
+# Allow access to manage networking resources
+KSV-0056 kubernetes/core/kube-vip/kube-vip.yml
+KSV-0056 kubernetes/core/nfs-provisioner/nfs-provisioner.yml
 
-#Allow kube-vip to see newtork traffic 
-KSV-0119 kube-vip/kube-vip.yml
+# Allow kube-vip to see network traffic
+KSV-0119 kubernetes/core/kube-vip/kube-vip.yml
 
 # Allow writable root filesystem for Home Assistant state/logs
-KSV-0014 homeassistant/homeassistant.yml
+KSV-0014 kubernetes/app/homeassistant/deployment.yml
 
 # kube-vip requires elevated permissions to manage host VIPs and network tables
-KSV-0118 kube-vip/kube-vip.yml
+KSV-0118 kubernetes/core/kube-vip/kube-vip.yml

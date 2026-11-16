@@ -36,6 +36,7 @@
                 token_name: "{{ vault_pve_exporter_token_name }}"
                 token_value: "{{ vault_pve_exporter_token_value }}"
                 verify_ssl: false
+      no_log: true
 
     - name: 📦 Add Prometheus Community Helm repo
       kubernetes.core.helm_repository:
@@ -76,10 +77,10 @@
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
-        src: "../../pve-exporter/pve-exporter.yml"
+        src: "{{ playbook_dir }}/../../../kubernetes/core/pve-exporter/pve-exporter.yml"
 
     - name: 🎯 Apply PVE ServiceMonitor
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
-        src: "../../pve-exporter/pve-servicemonitor.yml"
+        src: "{{ playbook_dir }}/../../../kubernetes/core/pve-exporter/pve-servicemonitor.yml"

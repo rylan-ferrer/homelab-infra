@@ -41,6 +41,23 @@ spec:
         - containerPort: 80
           name: http-tcp
           protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        readinessProbe:
+          tcpSocket:
+            port: 53
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 53
+          initialDelaySeconds: 15
+          periodSeconds: 20
         volumeMounts:
         - name: adguard-home-storage
           mountPath: /adguard/data
