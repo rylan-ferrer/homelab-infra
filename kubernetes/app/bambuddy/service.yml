@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bambuddy-svc
-  namespace: default
+  namespace: bambuddy
   annotations:
     metallb.io/loadBalancerIPs: 192.168.0.214
 spec:
@@ -22,7 +22,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bambustudio-slicer-api-svc
-  namespace: default
+  namespace: bambuddy
 spec:
   type: ClusterIP
   selector:

@@ -7,26 +7,61 @@
         name: nfs-common
         state: present
         update_cache: yes
-        
+
+- name: Pre-configure k3s server settings on control-plane nodes
+  hosts: control_plane
+  become: true
+  tasks:
+    - name: Ensure /etc/rancher/k3s directory exists
+      file:
+        path: /etc/rancher/k3s
+        state: directory
+        mode: "0755"
+
+    - name: Write k3s server config (disable ServiceLB and register kube-vip TLS SAN)
+      copy:
+        dest: /etc/rancher/k3s/config.yaml
+        mode: "0644"
+        content: |
+          disable:
+            - servicelb
+          tls-san:
+            - "192.168.0.211"
+
 - name: Initialize first control-plane node
   hosts: k3s-cp-1
   become: true
+  vars:
+    k3s_version: "v1.32.2+k3s1"
   tasks:
     - name: Install k3s as cluster-init server
       shell: |
-        curl -sfL https://get.k3s.io | sh -s - server --cluster-init
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - server --cluster-init
       args:
         creates: /etc/rancher/k3s/k3s.yaml
-    
+
     - name: Read the cluster join token
       slurp:
         src: /var/lib/rancher/k3s/server/node-token
       register: node_token_raw
+      no_log: true
+
+    - name: Copy kube-vip manifest to control-plane node
+      copy:
+        src: "{{ playbook_dir }}/../../../kubernetes/core/kube-vip/kube-vip.yml"
+        dest: /tmp/kube-vip.yml
+        mode: "0644"
+
+    - name: Apply kube-vip manifest
+      shell: "k3s kubectl apply -f /tmp/kube-vip.yml"
+      register: kubevip_result
+      changed_when: "'unchanged' not in kubevip_result.stdout"
 
     - name: Deploy cert-manager CRDs and controller
       ansible.builtin.shell:
         cmd: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.yaml
-      changed_when: true
+      register: cert_manager_result
+      changed_when: "'unchanged' not in cert_manager_result.stdout"
 
     - name: Wait for cert-manager webhook to become available
       ansible.builtin.shell:
@@ -40,6 +75,7 @@
           --namespace cert-manager
           --from-literal=api-token={{ cloudflare_api_token }}
           --dry-run=client -o yaml | kubectl apply -f -
+      no_log: true
       changed_when: true
 
     - name: Apply Let's Encrypt ClusterIssuer
@@ -77,6 +113,7 @@
           --namespace cloudflared
           --from-literal=token={{ cloudflare_tunnel_token }}
           --dry-run=client -o yaml | kubectl apply -f -
+      no_log: true
       changed_when: true
 
     - name: Deploy Cloudflare Tunnel Connector
@@ -102,7 +139,7 @@
               spec:
                 containers:
                 - name: cloudflared
-                  image: cloudflare/cloudflared:latest
+                  image: cloudflare/cloudflared:2025.2.1
                   args:
                   - tunnel
                   - --no-autoupdate
@@ -122,46 +159,32 @@
   hosts: k3s-cp-2:k3s-cp-3
   become: true
   vars:
+    k3s_version: "v1.32.2+k3s1"
     k3s_url: "https://{{ hostvars['k3s-cp-1']['ansible_host'] }}:6443"
     k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
   tasks:
     - name: Join as additional control-plane node
       shell: |
-        curl -sfL https://get.k3s.io | sh -s - server --server {{ k3s_url }} --token {{ k3s_token }}
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - server --server {{ k3s_url }} --token {{ k3s_token }}
       args:
         creates: /etc/rancher/k3s/k3s.yaml
+      no_log: true
 
-- name: Join worker nodes
+- name: Join worker nodes via kube-vip HA endpoint
   hosts: workers
   become: true
   vars:
-    k3s_url: "https://{{ hostvars['k3s-cp-1']['ansible_host'] }}:6443"
+    k3s_version: "v1.32.2+k3s1"
+    k3s_vip: "192.168.0.211"
+    k3s_url: "https://{{ k3s_vip }}:6443"
     k3s_token: "{{ hostvars['k3s-cp-1']['node_token_raw']['content'] | b64decode | trim }}"
   tasks:
     - name: Join as worker node
       shell: |
-        curl -sfL https://get.k3s.io | sh -s - agent --server {{ k3s_url }} --token {{ k3s_token }}
+        curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="{{ k3s_version }}" sh -s - agent --server {{ k3s_url }} --token {{ k3s_token }}
       args:
         creates: /etc/rancher/k3s/agent
-
-- name: Disable k3s built-in ServiceLB
-  hosts: control_plane
-  become: true
-  serial: 1
-  tasks:
-    - name: Write k3s config
-      copy:
-        dest: /etc/rancher/k3s/config.yaml
-        content: |
-          disable:
-            - servicelb
-          tls-san:
-            - "192.168.0.211"
-
-    - name: Restart k3s to apply config
-      systemd:
-        name: k3s
-        state: restarted
+      no_log: true
 
 - name: Deploy MetalLB
   hosts: k3s-cp-1
@@ -169,9 +192,10 @@
   tasks:
     - name: Copy MetalLB manifest to control-plane node
       copy:
-        src: "{{ playbook_dir }}/../../metallb/metallb.yml"
+        src: "{{ playbook_dir }}/../../../kubernetes/core/metallb/metallb.yml"
         dest: /tmp/metallb.yml
-    
+        mode: "0644"
+
     - name: Install MetalLB controller and CRDs
       shell: "k3s kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml"
       register: metallb_install_result
@@ -179,21 +203,12 @@
 
     - name: Wait for MetalLB controller to be ready
       shell: "k3s kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=90s"
+      changed_when: false
 
     - name: Apply MetalLB manifest
       shell: "k3s kubectl apply -f /tmp/metallb.yml"
       register: metallb_result
       changed_when: "'unchanged' not in metallb_result.stdout"
-
-    - name: Copy kube-vip manifest to control-plane node
-      copy:
-        src: "{{ playbook_dir }}/../../kube-vip/kube-vip.yml"
-        dest: /tmp/kube-vip.yml
-
-    - name: Apply kube-vip manifest
-      shell: "k3s kubectl apply -f /tmp/kube-vip.yml"
-      register: kubevip_result
-      changed_when: "'unchanged' not in kubevip_result.stdout"
 
 - name: Install and connect Tailscale on all nodes
   hosts: all
@@ -208,3 +223,4 @@
       shell: "tailscale up --authkey={{ vault_tailscale_authkey }} --ssh"
       register: ts_result
       changed_when: "'Success' in ts_result.stdout"
+      no_log: true
